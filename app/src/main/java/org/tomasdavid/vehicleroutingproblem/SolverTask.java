@@ -3,14 +3,10 @@ package org.tomasdavid.vehicleroutingproblem;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.widget.TextView;
 
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
-import org.optaplanner.examples.vehiclerouting.domain.Customer;
 import org.optaplanner.examples.vehiclerouting.domain.VehicleRoutingSolution;
-
-import java.util.List;
 
 public class SolverTask extends AsyncTask<VehicleRoutingSolution, Context, String> {
 
@@ -28,22 +24,22 @@ public class SolverTask extends AsyncTask<VehicleRoutingSolution, Context, Strin
         SolverFactory solverFactory = SolverFactory.createFromXmlResource(SOLVER_CONFIG);
         Solver solver = solverFactory.buildSolver();
 
+        SolutionPainter sp = (SolutionPainter)activity.findViewById(R.id.solution_painter);
+        sp.setBs(vrs[0]);
+        sp.postInvalidate();
+
         solver.solve(vrs[0]);
 
         VehicleRoutingSolution bs = (VehicleRoutingSolution)solver.getBestSolution();
 
-        String s = "RESULTS:\nBest score is: " + bs.getScore().toString() + "\n";
+        sp.setBs(bs);
+        sp.postInvalidate();
+        String s = "";
 
-        List<Customer> cl = bs.getCustomerList();
-
-        for (Customer c : cl) {
-            s += "Customer: " + c.getId() + " is served by vehicle " + c.getVehicle().getId() + "\n";
-        }
         return s;
     }
 
     protected void onPostExecute(String result) {
-        TextView tv = (TextView)activity.findViewById(R.id.text_view);
-        tv.setText(result);
+
     }
 }
